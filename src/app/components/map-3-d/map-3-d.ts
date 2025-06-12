@@ -12,14 +12,16 @@ import { watch } from '@arcgis/core/core/reactiveUtils';
 // @ts-ignore
 import * as satellite from 'satellite.js';
 import { SatelliteService } from '../../services/satellite';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map-3-d',
-  // standalone: true,
   templateUrl: './map-3-d.html',
   styleUrl: './map-3-d.css'
 })
 export class Map3D implements AfterViewInit {
+  private subscription!: Subscription;
+
   @ViewChild('viewDiv', { static: true }) viewDiv!: ElementRef<HTMLDivElement>;
 
   constructor(private satelliteService: SatelliteService) { }
@@ -74,33 +76,31 @@ export class Map3D implements AfterViewInit {
       }
     });
 
+
     const tleUrl = 'https://developers.arcgis.com/javascript/latest/sample-code/satellites-3d/live/brightest.txt';
-    const response = await esriRequest(tleUrl, { responseType: 'text' });
+    console.log('Loaded base satellites!');
 
-    console.log('Loaded TLE data:', response.data);
-    
-    const lines = response.data.split('\n');
-    const count = Math.floor(lines.length / 3);
+    this.subscription = this.satelliteService.satellites$.subscribe(satellites => {
+      
+      console.log('Received satellites:', satellites);
 
-    for (let i = 0; i < count; i++) {
-      const name = lines[i * 3];
-      const line1 = lines[i * 3 + 1];
-      const line2 = lines[i * 3 + 2];
-      const time = Date.now();
+      satelliteLayer.removeAll();
+      satelliteTracks.removeAll();
 
-      if (name.includes('COSMOS')) {
-        const designator = line1.substring(9, 16);
+      for (let sat of satellites) {
+        const time = Date.now();
+
+        const designator = sat.line1.substring(9, 16);
         const launchYear = Number(designator.substring(0, 2)) >= 57 ? `19${designator.substring(0, 2)}` : `20${designator.substring(0, 2)}`;
         const launchNum = Number(designator.substring(2, 5)).toString();
-        const noradId = Number(line1.substring(2, 7));
+        const noradId = Number(sat.line1.substring(2, 7));
 
-        const loc = this.getSatelliteLocation(new Date(time), line1, line2);
+        const loc = this.getSatelliteLocation(new Date(time), sat.line1, sat.line2);
         if (!loc) continue;
 
         const popupTemplate = {
           title: '{name}',
           content: 'Launch number {number} of {year}',
-          // actions: [{ title: 'Show Satellite Track', id: 'track', className: 'esri-icon-globe' }],
         };
 
         satelliteLayer.add(
@@ -112,7 +112,7 @@ export class Map3D implements AfterViewInit {
               width: 48,
               height: 48,
             },
-            attributes: { name, line1, line2, time, year: launchYear, number: launchNum, id: noradId },
+            attributes: { name: sat.name, line1: sat.line1, line2: sat.line2, time, year: launchYear, number: launchNum, id: noradId },
             popupTemplate,
           })
         );
@@ -121,7 +121,7 @@ export class Map3D implements AfterViewInit {
         const days = 15;
         for (let j = 0; j < days * 24; j++) {
           const futureDate = new Date(time + j * days * 1000);
-          const futureLoc = this.getSatelliteLocation(futureDate, line1, line2);
+          const futureLoc = this.getSatelliteLocation(futureDate, sat.line1, sat.line2);
           if (futureLoc) {
             trackCoords.push([futureLoc.x, futureLoc.y, futureLoc.z]);
           }
@@ -143,8 +143,12 @@ export class Map3D implements AfterViewInit {
         });
 
         satelliteTracks.add(trackLine);
+
       }
-    }
+    });
+
+    await this.satelliteService.loadBaseSatellites(tleUrl);
+
   }
 
   getSatelliteLocation(date: Date, line1: string, line2: string) {
@@ -179,5 +183,7 @@ export class Map3D implements AfterViewInit {
     }
   }
 
-
+  ngOnDestroy() {
+    this.subscription?.unsubscribe();
+  }
 }

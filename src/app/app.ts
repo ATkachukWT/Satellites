@@ -43,7 +43,6 @@ export class App {
       const lon = parseFloat(res.iss_position.longitude);
 
       const newPosition = { latitude: lat, longitude: lon, time: timestamp };
-      console.log('New position fetched:', newPosition);
       this.positionService.updatePositions(newPosition);
     });
   }

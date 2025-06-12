@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Satellite } from '../utils/types';
 import esriRequest from '@arcgis/core/request';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SatelliteService {
+  private satellitesSubject = new BehaviorSubject<Satellite[]>([]);
+  satellites$ = this.satellitesSubject.asObservable();
+
   private satellites: Satellite[] = [];
 
   async loadBaseSatellites(url: string): Promise<void> {
@@ -21,24 +25,25 @@ export class SatelliteService {
 
       if (!name || !line1 || !line2) continue;
 
-      this.satellites.push({
-        name,
-        line1,
-        line2,
-        time: now,
-        origin: 'base'
-      });
+      if (name.includes('COSMOS')) {
+        this.satellites.push({
+          name,
+          line1,
+          line2,
+          time: now,
+          origin: 'base'
+        });
+      }
     }
+
+    this.satellitesSubject.next([...this.satellites]);
+        
   }
 
   addUserSatellite(name: string, line1: string, line2: string) {
-    this.satellites.push({
-      name,
-      line1,
-      line2,
-      time: Date.now(),
-      origin: 'user'
-    });
+    const sat: Satellite = { name, line1, line2, time: Date.now(), origin: "user" };
+    this.satellites.push(sat);
+    this.satellitesSubject.next([...this.satellites]);
   }
 
   getAllSatellites() {

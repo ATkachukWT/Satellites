@@ -18,7 +18,6 @@ export class PositionService {
     };
 
     const updatedPositions = [formattedPosition, ...this._positions.getValue()];
-    console.log('Updated positions:', updatedPositions);
     this._positions.next(updatedPositions);
   }
 
