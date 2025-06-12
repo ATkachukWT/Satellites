@@ -1,0 +1,1 @@
+var a,l=null,o=new Map;async function i(e){l==null&&(a==null&&(a=import("./chunk-REAN7MYC.js")),l=await a);let n=e.view,t=o.get(n);return t||(t=new l.default({view:n}),o.set(n,t)),t.addVoxelLayer(e)}function r(e){return o.get(e)}function s(e){let n=e.view,t=o.get(n);t&&t.removeVoxelLayer(e)<1&&(o.delete(n),o.size===0&&(a=null,l=null))}export{i as a,r as b,s as c};

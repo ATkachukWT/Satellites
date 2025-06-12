@@ -1,0 +1,1 @@
+import{c as n}from"./chunk-YR2HD3ZC.js";function o(e,r,a=n){return r||(r=new a),r===e||(r.removeAll(),t(e)?r.addMany(e):e&&r.add(e)),r}function s(e){return e}function t(e){return e&&(Array.isArray(e)||"items"in e&&Array.isArray(e.items))}export{o as a,s as b};

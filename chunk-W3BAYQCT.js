@@ -1,0 +1,1 @@
+import{b as r}from"./chunk-NNX76JDG.js";var t,n,a=!1;function p(){return t??=r("arcadeGeometryOperatorsWorker").then(e=>{n=e,a=!0,t=void 0})}async function i(e,o){return a?n.apply("invokeGeometryOp",[e,o]):(await p(),i(e,o))}export{i as a};

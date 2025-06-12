@@ -1,0 +1,1 @@
+import{c as e}from"./chunk-YQHQQW4I.js";import{a as r}from"./chunk-BOVYXYHK.js";var a=class extends e{constructor(t=r()){super(),this.origin=t}get slicePlaneLocalOrigin(){return this.origin}};export{a};

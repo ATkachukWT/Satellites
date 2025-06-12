@@ -1,0 +1,1 @@
+var t,e,r;(function(a){a[a.RasterImage=0]="RasterImage",a[a.Features=1]="Features"})(t||(t={})),function(a){a[a.MapLayer=0]="MapLayer",a[a.ViewLayer=1]="ViewLayer",a[a.Outline=2]="Outline",a[a.SnappingHint=3]="SnappingHint"}(e||(e={})),function(a){a[a.WithRasterImage=0]="WithRasterImage",a[a.WithoutRasterImage=1]="WithoutRasterImage"}(r||(r={}));export{t as a,e as b,r as c};

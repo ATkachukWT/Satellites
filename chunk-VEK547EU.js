@@ -1,0 +1,1 @@
+import{a as e}from"./chunk-6CUAH7AI.js";import{a}from"./chunk-54HXR2K7.js";import{b as r}from"./chunk-T4QAGZWF.js";import{a as n,b as i}from"./chunk-N2WTMF3X.js";var o=class extends e{constructor(t){super(i(n({},t),{constraint:new r(t.targetPoint)}))}get hints(){return[new a(this.targetPoint,this.isDraped,this.domain)]}};export{o as a};

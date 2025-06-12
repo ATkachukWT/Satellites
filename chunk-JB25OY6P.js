@@ -1,0 +1,1 @@
+import{u as i}from"./chunk-7TNP7O2W.js";function r(e){return e[e.openProp||"open"]}function s(e){requestAnimationFrame(()=>{e.transitionEl&&i(e.transitionEl,e.transitionProp,()=>{r(e)?e.onBeforeOpen():e.onBeforeClose()},()=>{r(e)?e.onOpen():e.onClose()})})}export{s as a};

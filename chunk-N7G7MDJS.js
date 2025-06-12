@@ -1,0 +1,1 @@
+import{a as s}from"./chunk-3REMXE4W.js";import{H as t}from"./chunk-QHVIRF5H.js";import{I as e}from"./chunk-WZDN6K3C.js";import{a as r}from"./chunk-QGVBCWUY.js";var o=class extends s{constructor(p){super(p),this.gpuResult=null}};r([t({constructOnly:!0,clonable:"reference"})],o.prototype,"gpuResult",void 0),o=r([e("esri.views.3d.layers.VoxelGraphic")],o);export{o as a};

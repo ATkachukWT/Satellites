@@ -1,0 +1,1 @@
+import{d as n,e as u}from"./chunk-KWBPUP6A.js";import{b as o}from"./chunk-TBA3OZMJ.js";import{b as r}from"./chunk-44S2QQS2.js";async function i(t,e,a){let s=r(t),{data:m}=await u(s,o.from(e),a);return m.count}async function I(t,e,a){let s=r(t),{data:m}=await n(s,o.from(e),a);return m.objectIds??[]}export{i as a,I as b};

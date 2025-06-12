@@ -1,0 +1,1 @@
+import{a as e}from"./chunk-AF5UMDFO.js";var r={readOnly:!0,get(){return e(this.view)}};var a;(function(t){t[t.Auto=0]="Auto",t[t.Euclidean=1]="Euclidean",t[t.Geodesic=2]="Geodesic"})(a||(a={}));export{r as a,a as b};

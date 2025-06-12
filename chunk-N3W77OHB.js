@@ -1,0 +1,1 @@
+var A,H,T;(function(O){O[O.INNER=0]="INNER",O[O.OUTER=1]="OUTER"})(A||(A={})),function(O){O[O.REGULAR=0]="REGULAR",O[O.HAS_NORTH_POLE=1]="HAS_NORTH_POLE",O[O.HAS_SOUTH_POLE=2]="HAS_SOUTH_POLE",O[O.HAS_BOTH_POLES=3]="HAS_BOTH_POLES"}(H||(H={})),function(O){O[O.FADING=0]="FADING",O[O.IMMEDIATE=1]="IMMEDIATE",O[O.UNFADED=2]="UNFADED"}(T||(T={}));export{A as a,H as b,T as c};

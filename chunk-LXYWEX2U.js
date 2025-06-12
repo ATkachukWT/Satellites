@@ -1,0 +1,1 @@
+var a=class{constructor(t=1/0,n=-1/0){this.near=t,this.far=n}set(t,n){this.near=t,this.far=n}union(t){t!=null&&(this.near=Math.min(this.near,t.near),this.far=Math.max(this.far,t.far))}within(t){return this.near<=t&&t<=this.far}};a.zero=new a(0,0);export{a};

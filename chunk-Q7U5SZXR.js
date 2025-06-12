@@ -1,0 +1,1 @@
+var S;(function(E){E[E.ELEVATION=0]="ELEVATION",E[E.BASEMAP=1]="BASEMAP",E[E.I3S_INDEX=2]="I3S_INDEX",E[E.I3S_DATA=3]="I3S_DATA",E[E.SYMBOLOGY=4]="SYMBOLOGY"})(S||(S={}));var I=(()=>{let E=new Array;return E[S.ELEVATION]=10,E[S.BASEMAP]=10,E[S.I3S_INDEX]=10,E[S.I3S_DATA]=10,E[S.SYMBOLOGY]=5,E})(),n=30;export{S as a,I as b,n as c};
