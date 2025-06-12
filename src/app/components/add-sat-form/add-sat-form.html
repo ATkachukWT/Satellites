@@ -1,0 +1,18 @@
+<form (ngSubmit)="onSubmit()">
+  <label>
+    Name:
+    <input type="text" name="name" [(ngModel)]="satellite.name" required />
+  </label>
+
+  <label>
+    Line 1:
+    <input type="text" name="line1" [(ngModel)]="satellite.line1" required />
+  </label>
+
+  <label>
+    Line 2:
+    <input type="text" name="line2" [(ngModel)]="satellite.line2" required />
+  </label>
+
+  <button type="submit">Add Satellite</button>
+</form>

@@ -1,0 +1,53 @@
+<div class="container">
+  <header class="header">
+    <h1>Satellite Tracker</h1>
+    <nav class="nav-list">
+      <button 
+        [class.active]="activeMap === 'map1'" 
+        (click)="switchMap('map1')" 
+        class="nav-button"
+      >Map</button>
+      <button 
+        [class.active]="activeMap === 'map2'" 
+        (click)="switchMap('map2')" 
+        class="nav-button"
+      >Map-Feature</button>
+      <button 
+        [class.active]="activeMap === 'map3'" 
+        (click)="switchMap('map3')" 
+        class="nav-button"
+      >Map-3D</button>
+    </nav>
+  </header>
+  <main class="main-content">
+    @if (activeMap === 'map1' || activeMap === 'map2') {
+      <app-history (highlight)="highlight($event)"></app-history>
+    }
+    @if (activeMap === 'map3') {
+      <app-add-sat-form></app-add-sat-form>
+    }
+    
+    <div class="right-panel">
+      @if (activeMap === 'map1') {
+        <app-map 
+          class="map-component" 
+          [highlighted]="highlightedPosition"
+        ></app-map>
+      }
+      @if (activeMap === 'map2') {
+        <app-map-feature
+          class="map-component" 
+          [highlighted]="highlightedPosition"
+        ></app-map-feature>
+      }
+      @if (activeMap === 'map3') {
+        <app-map-3-d
+          class="map-component" 
+        ></app-map-3-d>
+      }
+      
+      
+    </div>
+  </main>
+
+</div>

@@ -1,0 +1,183 @@
+
+
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import esriRequest from '@arcgis/core/request';
+import Map from '@arcgis/core/Map';
+import SceneView from '@arcgis/core/views/SceneView';
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
+import Graphic from '@arcgis/core/Graphic';
+import Popup from '@arcgis/core/widgets/Popup';
+import { watch } from '@arcgis/core/core/reactiveUtils';
+
+// @ts-ignore
+import * as satellite from 'satellite.js';
+import { SatelliteService } from '../../services/satellite';
+
+@Component({
+  selector: 'app-map-3-d',
+  // standalone: true,
+  templateUrl: './map-3-d.html',
+  styleUrl: './map-3-d.css'
+})
+export class Map3D implements AfterViewInit {
+  @ViewChild('viewDiv', { static: true }) viewDiv!: ElementRef<HTMLDivElement>;
+
+  constructor(private satelliteService: SatelliteService) { }
+
+
+  async ngAfterViewInit() {
+    const satelliteLayer = new GraphicsLayer();
+    const satelliteTracks = new GraphicsLayer();
+
+    const map = new Map({
+      basemap: 'satellite',
+      layers: [satelliteLayer, satelliteTracks],
+    });
+
+    const view = new SceneView({
+      container: this.viewDiv.nativeElement,
+      map: map,
+      constraints: {
+        altitude: { max: 12000000000 },
+      },
+      popup: new Popup({ dockEnabled: true, dockOptions: { breakpoint: false } }),
+      environment: { lighting: { type: 'virtual' } },
+    });
+
+    watch(() => view.popup?.selectedFeature, () => satelliteTracks.removeAll());
+
+    view.popup?.on('trigger-action', (event) => {
+      if (event.action.id === 'track') {
+        satelliteTracks.removeAll();
+        const graphic = view.popup?.selectedFeature;
+        const trackFeatures: number[][] = [];
+
+        for (let i = 0; i < 60 * 24; i++) {
+          const loc = this.getSatelliteLocation(
+            new Date(graphic?.attributes.time + i * 60 * 1000),
+            graphic?.attributes.line1,
+            graphic?.attributes.line2
+          );
+          if (loc) trackFeatures.push([loc.x, loc.y, loc.z]);
+        }
+
+        const track = new Graphic({
+          geometry: { type: 'polyline', paths: [trackFeatures] },
+          symbol: {
+            type: 'line-3d',
+            symbolLayers: [{ type: 'line', material: { color: [192, 192, 192, 0.5] }, size: 3 }],
+          },
+        });
+
+
+        satelliteTracks.add(track);
+      }
+    });
+
+    const tleUrl = 'https://developers.arcgis.com/javascript/latest/sample-code/satellites-3d/live/brightest.txt';
+    const response = await esriRequest(tleUrl, { responseType: 'text' });
+
+    console.log('Loaded TLE data:', response.data);
+    
+    const lines = response.data.split('\n');
+    const count = Math.floor(lines.length / 3);
+
+    for (let i = 0; i < count; i++) {
+      const name = lines[i * 3];
+      const line1 = lines[i * 3 + 1];
+      const line2 = lines[i * 3 + 2];
+      const time = Date.now();
+
+      if (name.includes('COSMOS')) {
+        const designator = line1.substring(9, 16);
+        const launchYear = Number(designator.substring(0, 2)) >= 57 ? `19${designator.substring(0, 2)}` : `20${designator.substring(0, 2)}`;
+        const launchNum = Number(designator.substring(2, 5)).toString();
+        const noradId = Number(line1.substring(2, 7));
+
+        const loc = this.getSatelliteLocation(new Date(time), line1, line2);
+        if (!loc) continue;
+
+        const popupTemplate = {
+          title: '{name}',
+          content: 'Launch number {number} of {year}',
+          // actions: [{ title: 'Show Satellite Track', id: 'track', className: 'esri-icon-globe' }],
+        };
+
+        satelliteLayer.add(
+          new Graphic({
+            geometry: loc,
+            symbol: {
+              type: 'picture-marker',
+              url: 'https://developers.arcgis.com/javascript/latest/sample-code/satellites-3d/live/satellite.png',
+              width: 48,
+              height: 48,
+            },
+            attributes: { name, line1, line2, time, year: launchYear, number: launchNum, id: noradId },
+            popupTemplate,
+          })
+        );
+
+        const trackCoords: number[][] = [];
+        const days = 15;
+        for (let j = 0; j < days * 24; j++) {
+          const futureDate = new Date(time + j * days * 1000);
+          const futureLoc = this.getSatelliteLocation(futureDate, line1, line2);
+          if (futureLoc) {
+            trackCoords.push([futureLoc.x, futureLoc.y, futureLoc.z]);
+          }
+        }
+
+        const trackLine = new Graphic({
+          geometry: {
+            type: 'polyline',
+            paths: [trackCoords],
+          },
+          symbol: {
+            type: 'line-3d',
+            symbolLayers: [{
+              type: 'line',
+              material: { color: [192, 192, 192, 0.5] },
+              size: 2
+            }]
+          }
+        });
+
+        satelliteTracks.add(trackLine);
+      }
+    }
+  }
+
+  getSatelliteLocation(date: Date, line1: string, line2: string) {
+    try {
+      const satrec = satellite.twoline2satrec(line1, line2);
+      const positionAndVelocity = satellite.propagate(
+        satrec,
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
+      );
+
+      if (!positionAndVelocity || !positionAndVelocity.position) {
+        return null;
+      }
+
+      const position = positionAndVelocity.position;
+      const gmst = satellite.gstime(date);
+      const positionGd = satellite.eciToGeodetic(position, gmst);
+      const rad2deg = 180 / Math.PI;
+      return {
+        type: "point" as const,
+        x: rad2deg * positionGd.longitude,
+        y: rad2deg * positionGd.latitude,
+        z: positionGd.height * 1000,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+
+}
